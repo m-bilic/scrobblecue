@@ -68,22 +68,11 @@ Each phase ends with something you can run and see working.
 
 ---
 
-## 4. Who does what
+## 4. How it is developed
 
-**You (owner)**
-- Install: JDK 25 (installed – set `JAVA_HOME`), Android Studio, Node.js 24 LTS (upgrade from 18), Git (installed). Docker Desktop is optional – only needed to build the backend image locally.
-- Register **scrobblecue.com** and **scrobblecue.app**.
-- Create the public **GitHub repository** (and enable secret scanning + push protection).
-- Create a Last.fm API account and a Discogs developer app, and put the keys in a local `.env` file yourself (never committed). Create a separate Last.fm **test account** for development.
-- All git commits.
-- Test on your phone and turntable, and make product decisions.
-- Google Play Console account (~€24), store listing, and recruit **12 testers for a 14-day closed test** (required for new personal developer accounts).
-- Trademark check for "ScrobbleCue" (USPTO / EUIPO).
-- Before public release: email **partners@last.fm** describing ScrobbleCue, with screenshots of the "powered by AudioScrobbler" button and links, asking for approval (required by the Last.fm API terms) and whether the name is OK.
-
-**Claude**
-- Write the code, tests and CI config (no commits).
-- Explain each part as it's built: what lives where and why.
+- **Maintainer:** product decisions, review, testing on real devices and turntables, API accounts and secrets, releases and all commits.
+- **Code generation:** code, tests, CI configuration and documentation are generated with Claude Code under the maintainer's direction.
+- **Release requirements:** a Google Play closed test with 12 testers for 14 days (required for new personal developer accounts), and prior approval from Last.fm for public pages that use its API (email to partners@last.fm with screenshots of the "powered by AudioScrobbler" placements).
 
 ---
 

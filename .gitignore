@@ -31,3 +31,7 @@ node_modules/
 dist/
 coverage/
 npm-debug.log*
+
+# Personal notes and settings – never committed
+*.local.md
+.claude/settings.local.json
