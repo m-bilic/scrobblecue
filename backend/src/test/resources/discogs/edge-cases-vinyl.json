@@ -1,0 +1,46 @@
+{
+  "id": 900001,
+  "title": "Edge  Cases   Compilation",
+  "artists": [
+    { "name": "Various", "join": "", "anv": "", "id": 194 }
+  ],
+  "formats": [
+    { "name": "Vinyl", "qty": "2", "descriptions": ["LP", "Compilation"] }
+  ],
+  "tracklist": [
+    { "position": "", "type_": "heading", "title": "Side One", "duration": "" },
+    {
+      "position": "A1", "type_": "track", "title": "Purple Song", "duration": "4:05",
+      "artists": [
+        { "name": "Prince (2)", "join": "&", "anv": "" },
+        { "name": "The Revolution", "join": "", "anv": "" }
+      ]
+    },
+    {
+      "position": "A2", "type_": "index", "title": "Suite", "duration": "",
+      "sub_tracks": [
+        { "position": "A2a", "type_": "track", "title": "Suite Part One", "duration": "2:10",
+          "artists": [ { "name": "Ensemble", "join": "", "anv": "" } ] },
+        { "position": "A2b", "type_": "track", "title": "Suite Part Two", "duration": "2:20",
+          "artists": [ { "name": "Ensemble", "join": "", "anv": "" } ] }
+      ]
+    },
+    {
+      "position": "A3", "type_": "track", "title": "Interlude", "duration": "0:20",
+      "artists": [ { "name": "Somebody", "join": "Feat.", "anv": "" }, { "name": "Guest (12)", "join": "", "anv": "" } ]
+    },
+    { "position": "", "type_": "heading", "title": "Side Two", "duration": "" },
+    {
+      "position": "B1", "type_": "track", "title": "No Length Given", "duration": "",
+      "artists": [ { "name": "Artist One", "join": ",", "anv": "" }, { "name": "Artist Two", "join": "", "anv": "" } ]
+    },
+    {
+      "position": "B2", "type_": "track", "title": "  Very   Long  Jam ", "duration": "1:02:15",
+      "artists": [ { "name": "Jam Band", "join": "", "anv": "" } ]
+    },
+    {
+      "position": "Video", "type_": "track", "title": "Bonus Clip", "duration": "3:00",
+      "artists": [ { "name": "Jam Band", "join": "", "anv": "" } ]
+    }
+  ]
+}

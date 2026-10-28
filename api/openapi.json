@@ -1,0 +1,870 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "description" : "Stateless API: signs and forwards requests to Last.fm and Discogs, prepares tracklists and timestamps. Stores no user data.",
+    "license" : {
+      "name" : "MIT"
+    },
+    "title" : "ScrobbleCue API",
+    "version" : "v1"
+  },
+  "paths" : {
+    "/v1/auth/discogs/callback" : {
+      "get" : {
+        "operationId" : "callback_1",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "state",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "oauth_token",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "oauth_verifier",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "cookie",
+          "name" : "sc_discogs_request",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "discogs-auth-controller" ]
+      }
+    },
+    "/v1/auth/discogs/disconnect" : {
+      "post" : {
+        "operationId" : "disconnect",
+        "parameters" : [ {
+          "in" : "header",
+          "name" : "Authorization",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/BundleResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "discogs-auth-controller" ]
+      }
+    },
+    "/v1/auth/discogs/redirect" : {
+      "get" : {
+        "operationId" : "redirect",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "state",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "discogs-auth-controller" ]
+      }
+    },
+    "/v1/auth/discogs/start" : {
+      "post" : {
+        "operationId" : "start_1",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/StartRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StartResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "discogs-auth-controller" ]
+      }
+    },
+    "/v1/auth/lastfm/callback" : {
+      "get" : {
+        "operationId" : "callback",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "state",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "token",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "last-fm-auth-controller" ]
+      }
+    },
+    "/v1/auth/lastfm/start" : {
+      "post" : {
+        "operationId" : "start",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/StartRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StartResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "last-fm-auth-controller" ]
+      }
+    },
+    "/v1/auth/logout" : {
+      "post" : {
+        "operationId" : "logout",
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "last-fm-auth-controller" ]
+      }
+    },
+    "/v1/discogs/collection" : {
+      "get" : {
+        "operationId" : "collection",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "page",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 1,
+            "minimum" : 1
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "discogs-collection-controller" ]
+      }
+    },
+    "/v1/lastfm/now-playing" : {
+      "post" : {
+        "operationId" : "nowPlaying",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/NowPlayingRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "last-fm-scrobble-controller" ]
+      }
+    },
+    "/v1/lastfm/recent" : {
+      "get" : {
+        "operationId" : "recent",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "from",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }, {
+          "in" : "query",
+          "name" : "to",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RecentResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "last-fm-scrobble-controller" ]
+      }
+    },
+    "/v1/lastfm/scrobbles" : {
+      "post" : {
+        "operationId" : "scrobble",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ScrobbleRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ScrobbleResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "last-fm-scrobble-controller" ]
+      }
+    },
+    "/v1/me" : {
+      "get" : {
+        "operationId" : "me",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MeResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "me-controller" ]
+      }
+    },
+    "/v1/meta" : {
+      "get" : {
+        "operationId" : "meta",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MetaResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "meta-controller" ]
+      }
+    },
+    "/v1/scrobbles/timeline" : {
+      "post" : {
+        "operationId" : "timeline",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TimelineRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TimelineResponse"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "timeline-controller" ]
+      }
+    },
+    "/v1/tracklists/prepare" : {
+      "post" : {
+        "operationId" : "prepare",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PrepareRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PreparedTracklist"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "tags" : [ "tracklist-controller" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "BundleResponse" : {
+        "type" : "object",
+        "properties" : {
+          "bundle" : {
+            "type" : "string"
+          }
+        }
+      },
+      "DiscogsArtist" : {
+        "type" : "object",
+        "properties" : {
+          "join" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        }
+      },
+      "DiscogsFormat" : {
+        "type" : "object",
+        "properties" : {
+          "descriptions" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "qty" : {
+            "type" : "string"
+          }
+        }
+      },
+      "DiscogsRelease" : {
+        "type" : "object",
+        "properties" : {
+          "artists" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DiscogsArtist"
+            }
+          },
+          "formats" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DiscogsFormat"
+            }
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "tracklist" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DiscogsTrack"
+            }
+          }
+        }
+      },
+      "DiscogsTrack" : {
+        "type" : "object",
+        "properties" : {
+          "artists" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DiscogsArtist"
+            }
+          },
+          "duration" : {
+            "type" : "string"
+          },
+          "position" : {
+            "type" : "string"
+          },
+          "sub_tracks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DiscogsTrack"
+            }
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "type_" : {
+            "type" : "string"
+          }
+        }
+      },
+      "MeResponse" : {
+        "type" : "object",
+        "properties" : {
+          "discogsUser" : {
+            "type" : "string"
+          },
+          "lastfmUser" : {
+            "type" : "string"
+          }
+        }
+      },
+      "MetaResponse" : {
+        "type" : "object",
+        "properties" : {
+          "apiVersion" : {
+            "type" : "string"
+          },
+          "minClientVersion" : {
+            "$ref" : "#/components/schemas/MinClientVersion"
+          }
+        }
+      },
+      "MinClientVersion" : {
+        "type" : "object",
+        "properties" : {
+          "android" : {
+            "type" : "string"
+          },
+          "web" : {
+            "type" : "string"
+          }
+        }
+      },
+      "NowPlayingRequest" : {
+        "type" : "object",
+        "properties" : {
+          "album" : {
+            "type" : "string"
+          },
+          "albumArtist" : {
+            "type" : "string"
+          },
+          "artist" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "durationSec" : {
+            "type" : "integer",
+            "format" : "int32",
+            "exclusiveMinimum" : 0
+          },
+          "track" : {
+            "type" : "string",
+            "minLength" : 1
+          }
+        },
+        "required" : [ "artist", "track" ]
+      },
+      "PrepareRequest" : {
+        "type" : "object",
+        "properties" : {
+          "corrections" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TrackCorrection"
+            }
+          },
+          "durations" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "integer",
+              "format" : "int32"
+            }
+          },
+          "release" : {
+            "$ref" : "#/components/schemas/DiscogsRelease"
+          }
+        },
+        "required" : [ "release" ]
+      },
+      "PreparedTrack" : {
+        "type" : "object",
+        "properties" : {
+          "artist" : {
+            "type" : "string"
+          },
+          "durationSec" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "durationSource" : {
+            "type" : "string",
+            "enum" : [ "CORRECTION", "DISCOGS", "LOOKUP", "DEFAULT" ]
+          },
+          "position" : {
+            "type" : "string"
+          },
+          "scrobblable" : {
+            "type" : "boolean"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        }
+      },
+      "PreparedTracklist" : {
+        "type" : "object",
+        "properties" : {
+          "album" : {
+            "type" : "string"
+          },
+          "albumArtist" : {
+            "type" : "string"
+          },
+          "groups" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TrackGroup"
+            }
+          },
+          "releaseId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "sideScrobblable" : {
+            "type" : "boolean"
+          },
+          "unassigned" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PreparedTrack"
+            }
+          }
+        }
+      },
+      "RecentResponse" : {
+        "type" : "object",
+        "properties" : {
+          "scrobbles" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/RecentScrobble"
+            }
+          }
+        }
+      },
+      "RecentScrobble" : {
+        "type" : "object",
+        "properties" : {
+          "album" : {
+            "type" : "string"
+          },
+          "artist" : {
+            "type" : "string"
+          },
+          "timestamp" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "track" : {
+            "type" : "string"
+          }
+        }
+      },
+      "ScrobbleItem" : {
+        "type" : "object",
+        "properties" : {
+          "album" : {
+            "type" : "string"
+          },
+          "albumArtist" : {
+            "type" : "string"
+          },
+          "artist" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "durationSec" : {
+            "type" : "integer",
+            "format" : "int32",
+            "exclusiveMinimum" : 0
+          },
+          "timestamp" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "track" : {
+            "type" : "string",
+            "minLength" : 1
+          }
+        },
+        "required" : [ "artist", "timestamp", "track" ]
+      },
+      "ScrobbleRequest" : {
+        "type" : "object",
+        "properties" : {
+          "scrobbles" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ScrobbleItem"
+            },
+            "maxItems" : 50,
+            "minItems" : 0
+          }
+        },
+        "required" : [ "scrobbles" ]
+      },
+      "ScrobbleResponse" : {
+        "type" : "object",
+        "properties" : {
+          "results" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ScrobbleResult"
+            }
+          }
+        }
+      },
+      "ScrobbleResult" : {
+        "type" : "object",
+        "properties" : {
+          "ignoredCode" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "ignoredMessage" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "string",
+            "enum" : [ "ACCEPTED", "IGNORED" ]
+          }
+        }
+      },
+      "StartRequest" : {
+        "type" : "object",
+        "properties" : {
+          "client" : {
+            "type" : "string",
+            "enum" : [ "WEB", "ANDROID" ]
+          }
+        },
+        "required" : [ "client" ]
+      },
+      "StartResponse" : {
+        "type" : "object",
+        "properties" : {
+          "authorizeUrl" : {
+            "type" : "string"
+          }
+        }
+      },
+      "TimelineEntry" : {
+        "type" : "object",
+        "properties" : {
+          "endsAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "position" : {
+            "type" : "string"
+          },
+          "scrobble" : {
+            "type" : "boolean"
+          },
+          "startsAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }
+      },
+      "TimelineRequest" : {
+        "type" : "object",
+        "properties" : {
+          "endedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "startedAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "tracks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TrackInput"
+            },
+            "minItems" : 1
+          }
+        },
+        "required" : [ "tracks" ]
+      },
+      "TimelineResponse" : {
+        "type" : "object",
+        "properties" : {
+          "tracks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/TimelineEntry"
+            }
+          }
+        }
+      },
+      "TrackCorrection" : {
+        "type" : "object",
+        "properties" : {
+          "artist" : {
+            "type" : "string"
+          },
+          "durationSec" : {
+            "type" : "integer",
+            "format" : "int32",
+            "exclusiveMinimum" : 0
+          },
+          "position" : {
+            "type" : "string",
+            "minLength" : 1
+          },
+          "skip" : {
+            "type" : "boolean"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "position" ]
+      },
+      "TrackGroup" : {
+        "type" : "object",
+        "properties" : {
+          "kind" : {
+            "type" : "string",
+            "enum" : [ "SIDE", "DISC", "ALL" ]
+          },
+          "label" : {
+            "type" : "string"
+          },
+          "tracks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PreparedTrack"
+            }
+          }
+        }
+      },
+      "TrackInput" : {
+        "type" : "object",
+        "properties" : {
+          "durationSec" : {
+            "type" : "integer",
+            "format" : "int32",
+            "exclusiveMinimum" : 0
+          },
+          "position" : {
+            "type" : "string"
+          },
+          "scrobblable" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "position" ]
+      }
+    },
+    "securitySchemes" : {
+      "bundle" : {
+        "description" : "Sealed credential bundle (apps)",
+        "scheme" : "bearer",
+        "type" : "http"
+      },
+      "cookie" : {
+        "description" : "Sealed credential bundle (website); write requests also need X-ScrobbleCue",
+        "in" : "cookie",
+        "name" : "sc_credentials",
+        "type" : "apiKey"
+      }
+    }
+  }
+}

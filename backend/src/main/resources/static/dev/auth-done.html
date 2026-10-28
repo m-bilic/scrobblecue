@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ScrobbleCue – connected (development)</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; }
+    textarea { width: 100%; height: 8rem; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <!-- Development stand-in for the Android App Link: shows the sealed bundle from the URL fragment.
+       The fragment never reaches the server; this page only reads it locally. -->
+  <h1>ScrobbleCue (development)</h1>
+  <p id="status"></p>
+  <textarea id="bundle" readonly hidden></textarea>
+  <script>
+    const params = new URLSearchParams(location.hash.slice(1));
+    const status = document.getElementById('status');
+    if (params.get('bundle')) {
+      status.textContent = 'Connected. This is your sealed credential bundle – use it as "Authorization: Bearer <bundle>":';
+      const box = document.getElementById('bundle');
+      box.value = params.get('bundle');
+      box.hidden = false;
+    } else {
+      status.textContent = 'Not connected: ' + (params.get('error') || 'no bundle in the link');
+    }
+  </script>
+</body>
+</html>

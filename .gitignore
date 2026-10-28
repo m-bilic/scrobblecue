@@ -1,0 +1,33 @@
+# Secrets – never commit real keys
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+local.properties
+google-services.json
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# Java / Gradle (backend, android)
+.gradle/
+build/
+out/
+*.class
+*.log
+
+# Android
+.cxx/
+captures/
+.externalNativeBuild/
+
+# Node / web
+node_modules/
+dist/
+coverage/
+npm-debug.log*

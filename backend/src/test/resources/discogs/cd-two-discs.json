@@ -1,0 +1,11 @@
+{
+  "id": 900002,
+  "title": "Double CD",
+  "artists": [ { "name": "Band", "join": "", "anv": "" } ],
+  "formats": [ { "name": "CD", "qty": "2", "descriptions": ["Album"] } ],
+  "tracklist": [
+    { "position": "1-1", "type_": "track", "title": "First", "duration": "3:00" },
+    { "position": "1-2", "type_": "track", "title": "Second", "duration": "4:00" },
+    { "position": "2-1", "type_": "track", "title": "Third", "duration": "5:00" }
+  ]
+}

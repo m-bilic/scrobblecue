@@ -1,0 +1,16 @@
+# Test-only settings, loaded in addition to src/main/resources/application.yml.
+# Fixed, publicly known keys – never use these anywhere else.
+scrobblecue:
+  credentials:
+    keys: test1:AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=
+  urls:
+    public-base: http://localhost:8080
+    web: http://localhost:5173
+    android-auth-link: https://scrobblecue.app/android/auth
+  lastfm:
+    api-key: test-api-key
+    shared-secret: test-shared-secret
+  discogs:
+    consumer-key: test-consumer-key
+    consumer-secret: test-consumer-secret
+    user-agent: ScrobbleCueTests/0.1

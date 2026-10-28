@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: scrobblecue-backend
+  config:
+    # Local development: read secrets from the repository's .env file (git-ignored).
+    # On a server, the same names are set as real environment variables instead.
+    import: optional:file:../.env[.properties]
+  mvc:
+    problemdetails:
+      enabled: true
+
+server:
+  port: 8080
+
+scrobblecue:
+  meta:
+    api-version: v1
+    min-client-version:
+      android: ${MIN_CLIENT_VERSION_ANDROID:0.0.0}
+      web: ${MIN_CLIENT_VERSION_WEB:0.0.0}
+  credentials:
+    keys: ${CREDENTIAL_KEYS:}
+  urls:
+    public-base: ${PUBLIC_BASE_URL:http://localhost:8080}
+    web: ${WEB_BASE_URL:http://localhost:5173}
+    android-auth-link: ${ANDROID_AUTH_LINK:http://localhost:8080/dev/auth-done.html}
+  lastfm:
+    api-key: ${LASTFM_API_KEY:}
+    shared-secret: ${LASTFM_SHARED_SECRET:}
+    api-url: https://ws.audioscrobbler.com/2.0/
+    auth-url: https://www.last.fm/api/auth/
+  discogs:
+    consumer-key: ${DISCOGS_CONSUMER_KEY:}
+    consumer-secret: ${DISCOGS_CONSUMER_SECRET:}
+    user-agent: ${DISCOGS_USER_AGENT:ScrobbleCue/0.1 +https://scrobblecue.app}
+    api-url: https://api.discogs.com
+    authorize-url: https://www.discogs.com/oauth/authorize
+    # Discogs allows 60 authenticated requests per minute per IP; stay below it
+    requests-per-minute: 50
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+  # Stable ordering, so the committed api/openapi.json only changes when the API does
+  writer-with-order-by-keys: true
