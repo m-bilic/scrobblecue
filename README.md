@@ -2,11 +2,11 @@
 
 ScrobbleCue logs vinyl records you play to [Last.fm](https://www.last.fm) ("scrobbling"), using your [Discogs](https://www.discogs.com) collection as the source of release and track data.
 
-It consists of a stateless backend API, an Android app and a website. An iOS app is planned. There are no ScrobbleCue accounts, and the server stores no user data.
+It consists of a stateless backend API, a website and an Android app (in development). An iOS app is planned. There are no ScrobbleCue accounts, and the server stores no user data.
 
 ## Status
 
-Early development. There is no working code or release yet. The roadmap is described in [docs/PLAN.md](docs/PLAN.md), and the technical design in [docs/SPEC.md](docs/SPEC.md).
+Early development, not yet released or hosted. The backend and website work when run locally (see [Running locally](#running-locally-development)); the Android app is next. The roadmap is described in [docs/PLAN.md](docs/PLAN.md), and the technical design in [docs/SPEC.md](docs/SPEC.md).
 
 ## How it works
 
@@ -16,15 +16,21 @@ Early development. There is no working code or release yet. The roadmap is descr
 4. You scrobble a side, the whole record, or selected tracks.
 5. The backend signs the request with the app's API secret and forwards it to Last.fm, with timestamps based on track lengths. It keeps nothing.
 
-## Planned features
+## Features
+
+Working on the website:
 
 - Browse and search your Discogs collection
-- Scrobble a single side, a whole record, or selected tracks
+- Scrobble a single side, a whole record, or selected tracks, finished just now or up to an hour ago
+- Metadata cleanup (e.g. Discogs artist suffixes like `Artist (2)`) and missing track durations filled from MusicBrainz
+- Per-track corrections (length, skip), stored on the device and reused on later plays
+- Offline queue with duplicate protection: unsent scrobbles are retried, after checking Last.fm for ones that already arrived
+
+Planned:
+
+- Android app
 - Live mode: scrobble tracks as they finish playing, with a reminder to flip the record
 - Recently played (from Last.fm), most played and not played in a while (from the device)
-- Metadata cleanup (e.g. Discogs artist suffixes like `Artist (2)`) and missing track durations filled from MusicBrainz
-- Per-track corrections, stored on the device and reused on later plays
-- Offline queue
 - Later: barcode scanning, Android home-screen widget and Quick Settings tile, iOS app
 
 ## Architecture
