@@ -31,7 +31,7 @@ class OpenApiConfig {
 				.version("v1")
 				.description("Stateless API: signs and forwards requests to Last.fm and Discogs, prepares "
 						+ "tracklists and timestamps. Stores no user data.")
-				.license(new License().name("MIT")))
+				.license(new License().name("MIT").identifier("MIT")))
 			.components(new Components()
 				.addSecuritySchemes("bundle", new SecurityScheme().type(SecurityScheme.Type.HTTP)
 					.scheme("bearer")

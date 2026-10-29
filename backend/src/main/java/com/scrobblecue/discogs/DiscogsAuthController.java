@@ -7,8 +7,11 @@ import java.time.Duration;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
+import io.swagger.v3.oas.annotations.Operation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -86,6 +89,7 @@ class DiscogsAuthController {
 	}
 
 	/** Step 1: returns the URL the client opens in a browser. Requires Last.fm to be connected. */
+	@Operation(operationId = "discogsStart")
 	@PostMapping("/start")
 	StartResponse start(@Valid @RequestBody StartRequest request, CredentialBundle bundle) {
 		String state = credentials.newState(PROVIDER, request.client(), credentials.seal(bundle));
@@ -93,6 +97,7 @@ class DiscogsAuthController {
 	}
 
 	/** Step 2 (browser): get a request token, remember its secret in the browser, go to Discogs. */
+	@Operation(operationId = "discogsRedirect")
 	@GetMapping("/redirect")
 	ResponseEntity<Void> redirect(@RequestParam String state) {
 		OAuthState oauthState = credentials.openState(state, PROVIDER);
@@ -111,6 +116,7 @@ class DiscogsAuthController {
 	}
 
 	/** Step 3 (browser): Discogs sends the user here after approval; the extended bundle goes to the client. */
+	@Operation(operationId = "discogsCallback")
 	@GetMapping("/callback")
 	ResponseEntity<Void> callback(@RequestParam String state,
 			@RequestParam(name = "oauth_token", required = false) String requestToken,
@@ -138,6 +144,7 @@ class DiscogsAuthController {
 	 * Removes Discogs from the bundle. Apps receive the new bundle in the body; the website gets its
 	 * cookie replaced.
 	 */
+	@Operation(operationId = "discogsDisconnect")
 	@PostMapping("/disconnect")
 	ResponseEntity<BundleResponse> disconnect(CredentialBundle bundle,
 			@RequestHeader(name = HttpHeaders.AUTHORIZATION, required = false) String authorization) {

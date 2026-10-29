@@ -59,7 +59,8 @@ class TracklistPreparerTests {
 		assertThat(prepared.albumArtist()).isEqualTo("Various Artists");
 		assertThat(side(prepared, "A")).extracting(Track::artist)
 			.containsExactly("Prince & The Revolution", "Ensemble", "Ensemble", "Somebody Feat. Guest");
-		assertThat(side(prepared, "B")).extracting(Track::artist).startsWith("Artist One, Artist Two");
+		// A comma-separated list of collaborators is cut to the first artist
+		assertThat(side(prepared, "B")).extracting(Track::artist).startsWith("Artist One");
 	}
 
 	@Test

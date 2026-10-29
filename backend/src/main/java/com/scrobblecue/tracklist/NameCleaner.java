@@ -26,8 +26,9 @@ final class NameCleaner {
 	}
 
 	/**
-	 * Joins Discogs artist credits using their {@code join} values, e.g. {@code A & B}, {@code A Feat. B},
-	 * {@code A, B}. Discogs' "Various" becomes "Various Artists", Last.fm's name for compilations.
+	 * Joins Discogs artist credits using their {@code join} values, e.g. {@code A & B}, {@code A Feat. B}.
+	 * A list of collaborators ({@code A, B, C}) is cut to the first artist: Last.fm would treat the whole list
+	 * as one new artist. Discogs' "Various" becomes "Various Artists", Last.fm's name for compilations.
 	 */
 	static String joinArtists(List<DiscogsRelease.Artist> artists) {
 		if (artists == null || artists.isEmpty()) {
@@ -38,14 +39,10 @@ final class NameCleaner {
 			var artist = artists.get(i);
 			out.append(clean(artist.name()));
 			String join = artist.join() == null ? "" : artist.join().trim();
-			if (i < artists.size() - 1) {
-				if (join.isEmpty() || join.equals(",")) {
-					out.append(", ");
-				}
-				else {
-					out.append(' ').append(join).append(' ');
-				}
+			if (i == artists.size() - 1 || join.isEmpty() || join.equals(",")) {
+				break;
 			}
+			out.append(' ').append(join).append(' ');
 		}
 		String joined = out.toString();
 		return joined.equals("Various") ? "Various Artists" : joined;

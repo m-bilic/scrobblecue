@@ -23,7 +23,7 @@ scrobblecue:
   urls:
     public-base: ${PUBLIC_BASE_URL:http://localhost:8080}
     web: ${WEB_BASE_URL:http://localhost:5173}
-    android-auth-link: ${ANDROID_AUTH_LINK:http://localhost:8080/dev/auth-done.html}
+    android-auth-link: ${ANDROID_AUTH_LINK:scrobblecue-dev://auth}
   lastfm:
     api-key: ${LASTFM_API_KEY:}
     shared-secret: ${LASTFM_SHARED_SECRET:}

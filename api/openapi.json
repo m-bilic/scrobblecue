@@ -3,6 +3,7 @@
   "info" : {
     "description" : "Stateless API: signs and forwards requests to Last.fm and Discogs, prepares tracklists and timestamps. Stores no user data.",
     "license" : {
+      "identifier" : "MIT",
       "name" : "MIT"
     },
     "title" : "ScrobbleCue API",
@@ -11,7 +12,7 @@
   "paths" : {
     "/v1/auth/discogs/callback" : {
       "get" : {
-        "operationId" : "callback_1",
+        "operationId" : "discogsCallback",
         "parameters" : [ {
           "in" : "query",
           "name" : "state",
@@ -51,7 +52,7 @@
     },
     "/v1/auth/discogs/disconnect" : {
       "post" : {
-        "operationId" : "disconnect",
+        "operationId" : "discogsDisconnect",
         "parameters" : [ {
           "in" : "header",
           "name" : "Authorization",
@@ -77,7 +78,7 @@
     },
     "/v1/auth/discogs/redirect" : {
       "get" : {
-        "operationId" : "redirect",
+        "operationId" : "discogsRedirect",
         "parameters" : [ {
           "in" : "query",
           "name" : "state",
@@ -96,7 +97,7 @@
     },
     "/v1/auth/discogs/start" : {
       "post" : {
-        "operationId" : "start_1",
+        "operationId" : "discogsStart",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -124,7 +125,7 @@
     },
     "/v1/auth/lastfm/callback" : {
       "get" : {
-        "operationId" : "callback",
+        "operationId" : "lastFmCallback",
         "parameters" : [ {
           "in" : "query",
           "name" : "state",
@@ -150,7 +151,7 @@
     },
     "/v1/auth/lastfm/start" : {
       "post" : {
-        "operationId" : "start",
+        "operationId" : "lastFmStart",
         "requestBody" : {
           "content" : {
             "application/json" : {

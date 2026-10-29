@@ -5,8 +5,11 @@ import java.time.Clock;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
+import io.swagger.v3.oas.annotations.Operation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,6 +64,7 @@ class LastFmAuthController {
 	}
 
 	/** Step 1: the client gets the Last.fm page to open in a browser. */
+	@Operation(operationId = "lastFmStart")
 	@PostMapping("/lastfm/start")
 	StartResponse start(@Valid @RequestBody StartRequest request) {
 		String callback = UriComponentsBuilder.fromUriString(urls.publicBase())
@@ -71,6 +75,7 @@ class LastFmAuthController {
 	}
 
 	/** Step 2: Last.fm sends the browser here after the user approved; the bundle goes back to the client. */
+	@Operation(operationId = "lastFmCallback")
 	@GetMapping("/lastfm/callback")
 	ResponseEntity<Void> callback(@RequestParam String state, @RequestParam(required = false) String token) {
 		// A forged state is answered with a plain 401 problem: we cannot know where to send the user.
@@ -91,6 +96,7 @@ class LastFmAuthController {
 	}
 
 	/** Website only: forget the credentials stored in the browser. */
+	@Operation(operationId = "logout")
 	@PostMapping("/logout")
 	ResponseEntity<Void> logout() {
 		return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, delivery.clearCookie().toString()).build();

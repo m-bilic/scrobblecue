@@ -11,7 +11,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["callback_1"];
+        get: operations["discogsCallback"];
         put?: never;
         post?: never;
         delete?: never;
@@ -29,7 +29,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["disconnect"];
+        post: operations["discogsDisconnect"];
         delete?: never;
         options?: never;
         head?: never;
@@ -43,7 +43,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["redirect"];
+        get: operations["discogsRedirect"];
         put?: never;
         post?: never;
         delete?: never;
@@ -61,7 +61,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["start_1"];
+        post: operations["discogsStart"];
         delete?: never;
         options?: never;
         head?: never;
@@ -75,7 +75,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["callback"];
+        get: operations["lastFmCallback"];
         put?: never;
         post?: never;
         delete?: never;
@@ -93,7 +93,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["start"];
+        post: operations["lastFmStart"];
         delete?: never;
         options?: never;
         head?: never;
@@ -409,7 +409,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    callback_1: {
+    discogsCallback: {
         parameters: {
             query: {
                 state: string;
@@ -433,7 +433,7 @@ export interface operations {
             };
         };
     };
-    disconnect: {
+    discogsDisconnect: {
         parameters: {
             query?: never;
             header?: {
@@ -455,7 +455,7 @@ export interface operations {
             };
         };
     };
-    redirect: {
+    discogsRedirect: {
         parameters: {
             query: {
                 state: string;
@@ -475,7 +475,7 @@ export interface operations {
             };
         };
     };
-    start_1: {
+    discogsStart: {
         parameters: {
             query?: never;
             header?: never;
@@ -499,7 +499,7 @@ export interface operations {
             };
         };
     };
-    callback: {
+    lastFmCallback: {
         parameters: {
             query: {
                 state: string;
@@ -520,7 +520,7 @@ export interface operations {
             };
         };
     };
-    start: {
+    lastFmStart: {
         parameters: {
             query?: never;
             header?: never;
