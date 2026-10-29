@@ -1,0 +1,45 @@
+name: Android
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "android/**"
+      - "api/openapi.json"
+      - ".github/workflows/android.yml"
+  pull_request:
+    paths:
+      - "android/**"
+      - "api/openapi.json"
+      - ".github/workflows/android.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      # The API client is generated from api/openapi.json during the build, so a contract change that
+      # breaks the app fails here
+      - name: Unit tests and debug build
+        run: ./gradlew testDebugUnitTest assembleDebug
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-reports
+          path: android/app/build/reports/tests/

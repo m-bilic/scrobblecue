@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Release builds only (merged into the main manifest) -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Sign-in returns via a verified App Link: https://scrobblecue.app/android/auth#bundle=…
+             Android only opens it in this app once scrobblecue.app serves
+             /.well-known/assetlinks.json with the release signing key (phase 7). -->
+        <activity android:name=".MainActivity">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="scrobblecue.app"
+                    android:path="/android/auth"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

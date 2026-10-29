@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router'
 import { Footer } from './components/Footer'
 import { Header } from './components/Header'
+import { LiveBar } from './components/LiveBar'
 import { useSession } from './hooks/useSession'
 import { CollectionPage } from './pages/CollectionPage'
 import { ConnectPage } from './pages/ConnectPage'
@@ -27,6 +28,7 @@ export function App() {
         )}
       </main>
       <Footer />
+      {ready && <LiveBar />}
     </div>
   )
 }

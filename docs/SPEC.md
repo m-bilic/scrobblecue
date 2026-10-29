@@ -1,6 +1,6 @@
 # ScrobbleCue – Technical Specification
 
-_Version 0.2 · 2026-10-27 · Status: draft, before implementation_
+_Version 0.4 · 2026-10-28 · Status: in implementation (backend, website, Android app and live mode built; smart home screen next)_
 
 This document describes **how** ScrobbleCue is built: the decisions and their reasons, what lives where and why, APIs, flows and rules. The roadmap and phases live in [PLAN.md](PLAN.md).
 
@@ -136,6 +136,7 @@ Each decision lists the alternatives considered and why this one was chosen. Lon
 ### D14. Timestamp maths on the backend
 - **Decision:** `POST /v1/scrobbles/timeline` turns a list of tracks plus a start or end time into track timestamps (and live-mode send times).
 - **Why:** same reason as D13 – one implementation of the rules (30-second minimum, back-dating, side timing) for every client.
+- **Exception:** the Android app keeps a copy of the instant-mode calculation for offline use (D21).
 
 ### D15. API versioning by path
 - **Decision:** all endpoints under `/v1`; clients send `X-Client-Version`; `GET /v1/meta` returns the minimum supported client version.
@@ -160,6 +161,11 @@ Each decision lists the alternatives considered and why this one was chosen. Lon
 ### D20. Manual collection sync
 - **Decision:** the collection syncs automatically once after connecting Discogs, then only on request.
 - **Why:** keeps Discogs traffic through the server minimal (D8). The UI shows when the collection was last synced.
+
+### D21. Android works offline
+- **Decision:** the Android app caches the last prepared tracklist per release, and when the backend cannot be reached it computes instant-mode timestamps itself (`OfflineTimeline.kt`). Scrobbles wait in the queue until the phone is online.
+- **Alternatives:** require a connection to scrobble (simpler, but fails at the turntable without signal); move all tracklist rules to the clients (contradicts D13).
+- **Why:** "scrobble in airplane mode" is a phase 4 goal. The timestamp rule is a few lines and has a test that mirrors the backend's; the complex tracklist rules stay on the backend, so only records opened at least once online can be scrobbled offline.
 
 ---
 
@@ -266,10 +272,12 @@ Sealed form: `keyId.base64url(nonce ‖ ciphertext ‖ tag)`. `discogs` is absen
 | Credentials | Sealed bundle | DataStore, encrypted with an Android Keystore key | `HttpOnly; Secure; SameSite=Strict` cookie set by the backend – not readable by page scripts |
 | Collection | Collection items from Discogs (id, title, artist, year, format, cover URL, added date) | Room | IndexedDB (Dexie) |
 | Release cache | Raw release JSON per opened record | Room | IndexedDB |
+| Prepared tracklists | Last result of `/v1/tracklists/prepare` per release, for offline use (D21) | Room | – |
 | Duration cache | MusicBrainz / Last.fm lengths per track | Room | IndexedDB |
 | Corrections | Per (release, position): title, artist, duration, skip | Room | IndexedDB |
 | Play log | Local ID, release, side/scope, mode, start/end time, status | Room | IndexedDB |
-| Scrobble queue | Pending scrobbles (offline and live mode) with timestamps | Room | IndexedDB |
+| Scrobble queue | Pending scrobbles (offline and live mode) with timestamps; live ones with `sendAfter` | Room | IndexedDB |
+| Live session | The side playing live: tracks with start/end times, tracklist for the next side | Room (`meta`) | IndexedDB (`meta`) |
 
 "Log out" deletes the credentials. A separate "Clear all data" setting deletes everything.
 
@@ -335,7 +343,7 @@ Response: one result per scrobble – `ACCEPTED`, or `IGNORED` with Last.fm's re
 4. Backend verifies `state`, calls `auth.getSession` (signed) → session key + username, and seals a new bundle.
 5. The bundle is delivered without the server storing it:
    - **Web:** the callback response sets the bundle cookie and redirects to `https://scrobblecue.app/`.
-   - **Android:** the callback redirects to a verified App Link, `https://scrobblecue.app/android/auth#bundle=…`. The URL fragment is never sent to any server, and App Link verification (`assetlinks.json`) ensures only the ScrobbleCue app can receive it.
+   - **Android:** the callback redirects to a verified App Link, `https://scrobblecue.app/android/auth#bundle=…`. The URL fragment is never sent to any server, and App Link verification (`assetlinks.json`) ensures only the ScrobbleCue app can receive it. Development builds use `scrobblecue-dev://auth#bundle=…` instead, because App Links can only be verified against the live website.
 
 ### 8.2 Connect Discogs (Option A)
 OAuth 1.0a needs the request-token secret in the last step, but Discogs only issues it after it knows the callback URL – so the flow has one extra browser step.
@@ -364,12 +372,13 @@ The server keeps nothing between the steps.
 4. The record moves to the top of "Recently played".
 
 ### 8.6 Scrobble – live mode
-1. User taps **Start Side A**. Client calls `POST /v1/scrobbles/timeline` with `startedAt = now` → per track: start time (timestamp, now-playing moment) and end time (send moment).
-2. Client queues everything locally and sends "now playing" for track 1.
-3. As each track ends, the client sends its scrobble and the next "now playing".
-   - **Android:** WorkManager jobs, also with the app closed. A notification shows the current track and a **Stop** button; when the side ends it shows **"Flip to side B?"**.
-   - **Web:** browser timers while the tab is open; if the tab is closed, remaining scrobbles are sent on the next visit.
-4. Stopping removes the remaining queued scrobbles.
+1. User taps **Play live** on side A. Client calls `POST /v1/scrobbles/timeline` with `startedAt = now` → per track: start time (timestamp, now-playing moment) and end time (send moment). Android falls back to its own copy of the calculation when offline (D21).
+2. Client saves the play, all its scrobbles and the **live session** (the side, its tracks and times, and the tracklist for the next side) in one step. Each queued scrobble carries `sendAfter` = the end of its track; the regular queue (8.7) only sends scrobbles whose `sendAfter` has passed. So a closed app, a closed tab or a restart loses nothing: what is due is sent on the next run.
+3. At every track change the client sends what is due and "now playing" for the new track (best effort; it is only a display on Last.fm).
+   - **Android:** a unique WorkManager job is planned for the next track change, also with the app closed (`work/LiveTickWorker`). A silent notification shows the current track with a countdown and a **Stop** button; when the side ends, a second notification asks **"Flip to side B?"** with **Start side B** and **Done**.
+   - **Web:** timers while the tab is open; a bar at the bottom of every page shows the current track, Stop and the flip prompt. A reload continues the session.
+4. **Stop** removes the scrobbles of tracks that have not finished; finished ones are sent as usual. The track playing at that moment is kept and sent right away if enough of it has played – Last.fm's rule: half of the track or 4 minutes – because the record often runs a little ahead of estimated or slightly wrong lengths. Starting another side stops the current one first, with the same rule.
+5. **Start side B** starts the next side live with the stored tracklist; it is offered when the side has ended and already during its last track, for an early flip. **Done** ends the session.
 
 ### 8.7 Offline and failed sends
 1. Scrobbles stay in the local queue until Last.fm confirms them; the client retries with exponential backoff (Android: WorkManager when the network is back).
@@ -399,7 +408,7 @@ Discogs entries with `type_ = heading` are dropped; `type_ = index` entries are 
 ### 9.3 Cleaning
 - Strip Discogs disambiguation suffixes: `Artist (2)` → `Artist`.
 - Use each track's own artists for compilations; the release artist becomes Last.fm `albumArtist`.
-- Join multiple artists using Discogs `join` values (`&`, `feat.`, `,`).
+- Join multiple artists using Discogs `join` values (`&`, `feat.`). A comma-separated list of collaborators (`A, B, C`) is cut to the first artist, because Last.fm would treat the whole list as one new artist.
 - Trim whitespace and collapse duplicate spaces. No other renaming – Last.fm's own corrections handle the rest.
 - Apply the client's corrections last (title, artist, duration, skip).
 
@@ -461,7 +470,10 @@ Nothing is lost: the backend holds no state. In-flight requests fail and the cli
 ### 12.1 Android
 - **Architecture:** single activity, Compose screens, MVVM (`ViewModel` + `StateFlow`), Hilt for dependency injection.
 - **Packages:** `ui/` (screens, navigation), `data/` (Room, DataStore, generated API client, Discogs/MusicBrainz clients, repositories), `work/` (WorkManager: queue sending, live mode), later `widget/` and `tile/`.
-- **Package name:** `com.scrobblecue.app` (permanent once published on Google Play).
+- **Package name:** `com.scrobblecue.app` (permanent once published on Google Play). Development builds use `com.scrobblecue.app.dev`, so both can be installed side by side.
+- **API client:** Retrofit interfaces and models generated from `api/openapi.json` at build time (OpenAPI Generator, `kotlin` / `jvm-retrofit2` / kotlinx.serialization); the OkHttp client that adds the bundle as a Bearer token is written by hand (`data/api/`).
+- **Background sending:** a unique WorkManager job with a network constraint and exponential backoff sends the queue (`work/`). It is planned after every scrobble that could not be sent and on every app start.
+- **Development:** debug builds call `http://localhost:8080`; the phone reaches the backend on the developer's PC through `adb reverse tcp:8080 tcp:8080` (USB or wireless debugging). Plain HTTP is allowed for localhost in debug builds only.
 
 ### 12.2 Web
 - **Structure:** `pages/`, `components/`, `api/` (generated client), `external/` (Discogs + MusicBrainz), `store/` (IndexedDB via Dexie), `live/` (live-mode timers and queue).
@@ -476,8 +488,8 @@ Both clients implement the same flows (section 8) against the same generated API
 
 | Level | Backend | Android | Web |
 |---|---|---|---|
-| Unit | JUnit 5, AssertJ; tracklist rules, timeline maths, credential sealing | JUnit, Turbine; queue and duplicate-check logic | Vitest; queue and live-mode logic |
-| Integration | Spring Boot tests with MockMvc; Last.fm and Discogs replaced by Spring's **MockRestServiceServer** (canned responses) or Mockito mocks | Room in-memory DB, WorkManager test helpers | Fake IndexedDB |
+| Unit | JUnit 5, AssertJ; tracklist rules, timeline maths, credential sealing | JUnit; name cleaning, MusicBrainz matching, offline timeline (mirrors the backend's tests) | Vitest; queue and live-mode logic |
+| Integration | Spring Boot tests with MockMvc; Last.fm and Discogs replaced by Spring's **MockRestServiceServer** (canned responses) or Mockito mocks | Robolectric with an in-memory Room database and a fake of the generated Last.fm API: queue, uncertain sends, duplicate check, batching, live-mode due times; Room migrations against the exported schemas | Fake IndexedDB |
 | API contract | Generated spec checked in CI; clients regenerated and compiled | Compiles against generated client | Compiles against generated client |
 | UI / end-to-end | – | Compose UI tests | Playwright |
 

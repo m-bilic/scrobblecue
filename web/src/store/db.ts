@@ -43,6 +43,9 @@ export interface Correction {
 
 export type PlayScope = 'SIDE' | 'WHOLE' | 'TRACKS'
 
+/** Instant: the record was already played. Live: tracks are scrobbled as they finish playing. */
+export type PlayMode = 'INSTANT' | 'LIVE'
+
 /** One listening session in the local play log. */
 export interface Play {
   id: string
@@ -51,6 +54,8 @@ export interface Play {
   albumArtist: string
   cover: string
   scope: PlayScope
+  /** Missing on plays saved before live mode existed (= instant). */
+  mode?: PlayMode
   side?: string
   endedAt: string
   createdAt: string
@@ -74,6 +79,8 @@ export interface QueuedScrobble {
   albumArtist?: string
   durationSec: number
   timestamp: string
+  /** Live mode: not sent before the track has ended (ISO timestamp). Missing = send right away. */
+  sendAfter?: string
   state: 'pending' | 'uncertain'
 }
 

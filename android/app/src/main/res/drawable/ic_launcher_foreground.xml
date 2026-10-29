@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A record: dark disc, grooves and a red label. The 108dp canvas keeps it inside the adaptive-icon safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FF2B2930"
+        android:pathData="M54,22a32,32 0,1 1,0 64a32,32 0,1 1,0 -64z" />
+    <path
+        android:strokeColor="#FF49454F"
+        android:strokeWidth="1.5"
+        android:pathData="M54,30a24,24 0,1 1,0 48a24,24 0,1 1,0 -48z" />
+    <path
+        android:strokeColor="#FF49454F"
+        android:strokeWidth="1.5"
+        android:pathData="M54,37a17,17 0,1 1,0 34a17,17 0,1 1,0 -34z" />
+    <path
+        android:fillColor="@color/icon_accent"
+        android:pathData="M54,44a10,10 0,1 1,0 20a10,10 0,1 1,0 -20z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,52a2,2 0,1 1,0 4a2,2 0,1 1,0 -4z" />
+</vector>

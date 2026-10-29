@@ -5,6 +5,7 @@ import { api, unwrap } from '../api/client'
 import type { PreparedTrack, PreparedTracklist, TrackGroup } from '../api/types'
 import { getRelease, positionsWithoutDuration } from '../external/discogs'
 import { lookupDurations } from '../external/musicbrainz'
+import { startLive } from '../lib/live'
 import { scrobblePlay } from '../lib/scrobbler'
 import { formatDuration, parseDuration } from '../lib/time'
 import { db, type Correction, type Play, type PlayScope } from '../store/db'
@@ -68,6 +69,11 @@ export function RecordPage() {
       setLastPlay(play)
       setSelected(new Set())
     },
+  })
+
+  // Live mode: the side starts now; tracks are scrobbled as they finish (see LiveBar)
+  const live = useMutation({
+    mutationFn: (group: TrackGroup) => startLive(prepared.data!, group, item.data?.cover ?? ''),
   })
 
   async function saveCorrection(correction: Correction) {
@@ -149,6 +155,7 @@ export function RecordPage() {
         </p>
       )}
       <PlayResult play={lastPlay} error={scrobble.error} />
+      {live.error && <p className="error">Could not start live mode: {live.error.message}</p>}
 
       {tracklist.groups.map((group) => (
         <Side
@@ -160,6 +167,7 @@ export function RecordPage() {
           editing={editing}
           onToggle={toggle}
           onScrobbleSide={() => scrobble.mutate({ scope: 'SIDE', side: group.label, tracks: group.tracks })}
+          onPlayLive={() => live.mutate(group)}
           onCorrect={(c) => saveCorrection({ ...c, releaseId })}
         />
       ))}
@@ -172,6 +180,7 @@ export function RecordPage() {
           editing={editing}
           onToggle={toggle}
           onScrobbleSide={() => undefined}
+          onPlayLive={() => undefined}
           onCorrect={(c) => saveCorrection({ ...c, releaseId })}
         />
       )}
@@ -187,6 +196,7 @@ function Side(props: {
   editing: boolean
   onToggle: (position: string) => void
   onScrobbleSide: () => void
+  onPlayLive: () => void
   onCorrect: (c: Omit<Correction, 'releaseId'>) => void
 }) {
   const { group } = props
@@ -200,9 +210,15 @@ function Side(props: {
           {title} <span className="muted">{formatDuration(total)}</span>
         </h2>
         {props.sideScrobblable && group.kind === 'SIDE' && (
-          <button type="button" className="primary" disabled={props.busy} onClick={props.onScrobbleSide}>
-            Scrobble side {group.label}
-          </button>
+          <span className="side-actions">
+            {/* Live: the side starts now and each track is scrobbled as it finishes */}
+            <button type="button" disabled={props.busy} onClick={props.onPlayLive}>
+              Play live
+            </button>
+            <button type="button" className="primary" disabled={props.busy} onClick={props.onScrobbleSide}>
+              Scrobble side {group.label}
+            </button>
+          </span>
         )}
       </div>
       <ul className="tracks">

@@ -38,6 +38,7 @@ export async function scrobblePlay(input: ScrobbleInput): Promise<Play> {
     albumArtist: input.tracklist.albumArtist,
     cover: input.cover,
     scope: input.scope,
+    mode: 'INSTANT',
     side: input.side,
     endedAt: isoSeconds(input.endedAt),
     createdAt: new Date().toISOString(),
@@ -85,7 +86,8 @@ export function flushQueue(): Promise<void> {
 }
 
 async function doFlush(): Promise<void> {
-  const all = await db.queue.toArray()
+  const due = isDue(Date.now())
+  const all = (await db.queue.toArray()).filter(due)
   const byPlay = Map.groupBy(all, (q) => q.playId)
   for (const [playId, items] of byPlay) {
     const stop = await sendPlay(playId, items.sort((a, b) => a.seq - b.seq))
@@ -181,6 +183,11 @@ async function withoutAlreadyScrobbled(items: QueuedScrobble[]): Promise<QueuedS
   }
   const doneIds = new Set(done.map((q) => q.id))
   return items.filter((q) => !doneIds.has(q.id))
+}
+
+/** Live-mode scrobbles wait until their track has ended; everything else can be sent right away. */
+export function isDue(now: number): (q: QueuedScrobble) => boolean {
+  return (q) => q.sendAfter === undefined || Date.parse(q.sendAfter) <= now
 }
 
 /** Queued scrobbles found among the user's recent Last.fm scrobbles. */

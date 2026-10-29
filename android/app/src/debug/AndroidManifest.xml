@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Development builds only (merged into the main manifest) -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Plain HTTP is allowed to localhost only: the backend on the PC, reached via adb reverse -->
+    <application android:networkSecurityConfig="@xml/network_security_config">
+        <!-- Sign-in returns here: scrobblecue-dev://auth#bundle=… (backend: ANDROID_AUTH_LINK).
+             Release builds use a verified https App Link instead (src/release). -->
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="scrobblecue-dev" android:host="auth" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
